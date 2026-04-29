@@ -1,8 +1,4 @@
 {
-  "authors": [
-    "Chris Zhou <chrisrzhou@pm.me> (https://chrisrzhou.io)",
-    "Juninho De Luca <juninhodeluca@gmail.com>"
-  ],
   "bugs": "https://github.com/juninhodeluca/wordcloud-react-18/issues",
   "dependencies": {
     "d3-array": "^3.2.4",
@@ -19,7 +15,7 @@
     "seedrandom": "^3.0.5",
     "tippy.js": "^6.3.7"
   },
-  "description": "Simple React + D3 wordcloud component with powerful features.",
+  "description": "D3-based word cloud component for React >= 18",
   "devDependencies": {
     "@types/d3-array": "^3.2.2",
     "@types/d3-cloud": "^1.2.9",
@@ -37,21 +33,24 @@
     "dist",
     "types/index.d.ts"
   ],
-  "homepage": "https://react-wordcloud.netlify.com/",
-  "keywords": [
-    "react",
-    "wordcloud",
-    "visualization",
-    "d3"
-  ],
+  "homepage": "https://github.com/cecil-ia-labs/d3-wordcloud-react",
+  "keywords": ["wordcloud", "d3", "react", "react-18"],
+  "author": "juninhodeluca",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/index.module.js",
-  "name": "wordcloud-react-18",
+  "types": "dist/index.d.ts",
+  "name": "@cecil-ia-labs/d3-wordcloud-react",
   "peerDependencies": {
     "react": "^18.3.1"
   },
-  "repository": "https://github.com/juninhodeluca/wordcloud-react-18",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cecil-ia-labs/d3-wordcloud-react.git"
+  },
   "scripts": {
     "build": "microbundle --globals tippy.js=tippy --jsx React.createElement",
     "clean": "rm -rf dist",
@@ -59,6 +58,5 @@
     "test": "echo \"No tests specified - building and checking TypeScript types\""
   },
   "source": "index.js",
-  "typings": "types/index.d.ts",
-  "version": "1.3.1"
+  "version": "1.4.0"
 }
