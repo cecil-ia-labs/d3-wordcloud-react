@@ -34,7 +34,12 @@
     "types/index.d.ts"
   ],
   "homepage": "https://github.com/cecil-ia-labs/d3-wordcloud-react",
-  "keywords": ["wordcloud", "d3", "react", "react-18"],
+  "keywords": [
+    "wordcloud",
+    "d3",
+    "react",
+    "react-18"
+  ],
   "author": "juninhodeluca",
   "engines": {
     "node": ">=16.0.0",
@@ -58,5 +63,5 @@
     "test": "echo \"No tests specified - building and checking TypeScript types\""
   },
   "source": "index.js",
-  "version": "1.4.0"
+  "version": "1.4.0.1"
 }
