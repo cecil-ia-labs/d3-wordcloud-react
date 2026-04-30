@@ -63,5 +63,5 @@
     "test": "echo \"No tests specified - building and checking TypeScript types\""
   },
   "source": "index.js",
-  "version": "1.4.0.1"
+  "version": "1.4.1"
 }
