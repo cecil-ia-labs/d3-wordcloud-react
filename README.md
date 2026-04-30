@@ -8,7 +8,7 @@ This is a fork from [`☁️ react-wordcloud`](https://github.com/chrisrzhou/rea
 ## Install
 
 ```sh
-npm install wordcloud-react-18
+npm install d3-wordcloud-react
 ```
 
 ## Use
@@ -17,7 +17,7 @@ npm install wordcloud-react-18
 
 ```js
 import React from 'react';
-import { ReactWordCloud } from 'wordcloud-react-18';
+import { ReactWordCloud } from 'd3-wordcloud-react';
 
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
@@ -98,7 +98,7 @@ npm test
 This project uses automated releases. To publish a new version:
 
 1. Update version in `package.json`: `npm version [patch|minor|major]`
-2. Push to main: `git push origin main`  
+2. Push to main: `git push origin main`
 3. GitHub Actions will automatically create a release and publish to NPM
 
 See [RELEASE.md](./RELEASE.md) for detailed information about the release process.
