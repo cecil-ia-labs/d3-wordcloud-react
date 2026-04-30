@@ -1,5 +1,5 @@
 {
-  "bugs": "https://github.com/juninhodeluca/wordcloud-react-18/issues",
+  "bugs": "https://github.com/cecil-ia-labs/d3-wordcloud-react/issues",
   "dependencies": {
     "d3-array": "^3.2.4",
     "d3-cloud": "^1.2.7",
