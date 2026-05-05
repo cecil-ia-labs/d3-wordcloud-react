@@ -69,4 +69,7 @@ ReactWordCloud.defaultProps = {
   options: defaultOptions,
 };
 
-// export default ReactWordCloud;
+// Backward-compatible alias with the original package API.
+export const ReactWordcloud = ReactWordCloud;
+
+export default ReactWordCloud;
