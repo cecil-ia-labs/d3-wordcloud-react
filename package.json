@@ -47,6 +47,7 @@
   },
   "license": "MIT",
   "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "name": "@cecilialabs/d3-wordcloud-react",
   "type": "module",
@@ -61,8 +62,9 @@
     "build": "microbundle --globals tippy.js=tippy --jsx React.createElement",
     "clean": "rm -rf dist",
     "prepare": "npm run clean; npm run build",
+    "refresh": "rm -Rf node_modules/ dist/ package-lock.json && npm install",
     "test": "echo \"No tests specified - building and checking TypeScript types\""
   },
   "source": "index.js",
-  "version": "1.4.4"
+  "version": "1.4.5"
 }
