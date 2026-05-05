@@ -27,10 +27,10 @@ export const defaultOptions = {
 };
 
 export function ReactWordCloud({
-  callbacks,
+  callbacks = defaultCallbacks,
   maxWords = 100,
-  minSize,
-  options,
+  minSize = [300, 300],
+  options = defaultOptions,
   size: initialSize,
   words,
   ...rest
@@ -61,13 +61,6 @@ export function ReactWordCloud({
 
   return <div ref={ref} style={{ height: '100%', width: '100%' }} {...rest} />;
 }
-
-ReactWordCloud.defaultProps = {
-  callbacks: defaultCallbacks,
-  maxWords: 100,
-  minSize: [300, 300],
-  options: defaultOptions,
-};
 
 // Backward-compatible alias with the original package API.
 export const ReactWordcloud = ReactWordCloud;
