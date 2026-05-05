@@ -26,10 +26,12 @@ export const defaultOptions = {
   transitionDuration: 600,
 };
 
+const defaultMinSize = [300, 300];
+
 export function ReactWordCloud({
   callbacks = defaultCallbacks,
   maxWords = 100,
-  minSize = [300, 300],
+  minSize = defaultMinSize,
   options = defaultOptions,
   size: initialSize,
   words,
