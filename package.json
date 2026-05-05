@@ -47,7 +47,7 @@
   },
   "license": "MIT",
   "main": "dist/index.js",
-  "types": "types/index.d.ts",
+  "types": "dist/index.d.ts",
   "name": "@cecilialabs/d3-wordcloud-react",
   "peerDependencies": {
     "react": "^18.3.1"
