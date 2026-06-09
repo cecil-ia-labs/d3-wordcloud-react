@@ -86,5 +86,5 @@
   "source": "src/index.tsx",
   "type": "module",
   "types": "dist/index.d.ts",
-  "version": "1.4.6"
+  "version": "1.4.7"
 }
