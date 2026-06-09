@@ -10,12 +10,6 @@ jobs:
   pre-commit:
     name: Lint, build, and test
     runs-on: self-hosted
-    strategy:
-      matrix:
-        node-version:
-          - 20
-          - 24
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -24,7 +18,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           cache: npm
-          node-version: ${{ matrix.node-version }}
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
 
       - name: Clean workspace
         run: npm run clean
