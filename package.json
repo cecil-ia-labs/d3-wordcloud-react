@@ -75,8 +75,8 @@
   "scripts": {
     "build": "tsup src/index.tsx --format esm,cjs --dts --clean --out-dir dist",
     "clean": "rm -rf dist",
-    "lint": "eslint . --max-warnings=0",
-    "lint:fix": "eslint . --fix",
+    "lint": "npx eslint@9.39.4 . --max-warnings=0",
+    "lint:fix": "npx eslint@9.39.4 . --fix",
     "prepare": "npm run clean && npm run build",
     "refresh": "rm -rf node_modules dist package-lock.json && npm install",
     "test": "vitest run",
