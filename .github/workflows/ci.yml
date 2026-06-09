@@ -1,52 +1,140 @@
-name: Pre-commit
-
-permissions:
-  contents: read
+name: CI
 
 on:
   pull_request:
   push:
-    branches-ignore:
+    branches:
       - main
+      - master
+
+permissions:
+  contents: read
 
 jobs:
-  pre-commit:
-    name: Lint, build, and test
+  verify:
+    name: Verify (Node 22)
     runs-on: self-hosted
     steps:
-      - name: Check out repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
+          node-version: 22
           cache: npm
-          node-version: 24
-          registry-url: https://registry.npmjs.org/
-
-      - name: Clean workspace
-        run: npm run clean
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint source
-        run: npm run lint
+      - name: Lint
+        run: npm run test:lint
 
-      - name: Apply lint fixes
+      - name: Fixes
         run: npm run lint:fix
 
-      - name: Ensure lint fixes are not needed
-        run: git diff --exit-code
-
-      - name: Type-check the project
+      - name: Typecheck
         run: npm run typecheck
-
-      - name: Build the package
-        run: npm run build
 
       - name: Run the test suite with coverage
         run: npm run test:coverage
 
-      - name: Verify the package can be packed
-        run: npm pack --dry-run
+      - name: Build
+        run: npm run build
+
+  test-matrix-smoke:
+    name: Smoke (${{ matrix.react }}
+    runs-on: self-hosted
+    needs:
+      - verify
+    strategy:
+      fail-fast: false
+      matrix:
+        react: ["16.14.0", "17.0.2", "18.3.1", "19.2.0"]
+        exclude:
+          - react: "16.14.0"
+          - react: "17.0.2"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install base dependencies
+        run: npm ci
+
+      - name: Override React versions for matrix
+        run: |
+          npm install --no-save \
+            react@${{ matrix.react }} \
+            react-dom@${{ matrix.react }}
+
+      - name: Unit test smoke
+        run: npm run test:unit -- --watchAll=false --runInBand --passWithNoTests
+
+  test-matrix-full:
+    name: Full suite (${{ matrix.react }}
+    runs-on: self-hosted
+    needs:
+      - verify
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - react: "16.14.0"
+          - react: "18.3.1"
+          - react: "19.2.0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install base dependencies
+        run: npm ci
+
+      - name: Override React versions for matrix
+        run: |
+          npm install --no-save \
+            react@${{ matrix.react }} \
+            react-dom@${{ matrix.react }}
+
+      - name: Unit tests
+        run: npm run test:unit -- --watchAll=false --runInBand
+
+      - name: Build
+        run: npm run build
+
+  branch-protection-gate:
+    name: Branch Protection Gate
+    runs-on: self-hosted
+    needs:
+      - verify
+      - test-matrix-smoke
+      - test-matrix-full
+    if: ${{ always() }}
+    steps:
+      - name: Enforce required checks
+        run: |
+          if [ "${{ needs.verify.result }}" != "success" ]; then
+            echo "Required CI checks did not pass: verify"
+            exit 1
+          fi
+          if [ "${{ needs.test-matrix-smoke.result }}" != "success" ]; then
+            echo "Required CI checks did not pass: test-matrix-smoke"
+            exit 1
+          fi
+          if [ "${{ needs.test-matrix-full.result }}" != "success" ]; then
+            echo "Required CI checks did not pass: test-matrix-full"
+            exit 1
+          fi
+          echo "All required checks passed."

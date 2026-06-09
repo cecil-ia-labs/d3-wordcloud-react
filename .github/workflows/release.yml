@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to NPM
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify package
+        run: npm run test
+
+      - name: Build package
+        run: npm run build
+
+      - name: Security audit (production dependencies)
+        run: npm audit --omit=dev
+
+      - name: Validate package tarball (dry run)
+        run: npm publish --access public --dry-run
+
+      - name: Guard publish (skip if version already exists)
+        id: publish_guard
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Version ${PACKAGE_NAME}@${PACKAGE_VERSION} already exists on npm."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "Version ${PACKAGE_NAME}@${PACKAGE_VERSION} is new and eligible for publish."
+          fi
+
+      - name: Publish package
+        if: steps.publish_guard.outputs.publish == 'true'
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

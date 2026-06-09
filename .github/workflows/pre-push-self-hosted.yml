@@ -1,0 +1,42 @@
+name: Pre-Push Self-Hosted Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  pre_push_gate:
+    name: Pre-Push Gate
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Flight check
+        run: npm run flight-check
+
+      - name: Lint
+        run: npm run test:lint
+
+      - name: Test
+        run: npm test
