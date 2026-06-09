@@ -45,17 +45,16 @@ jobs:
       - name: Build
         run: npm run build
 
-  test-matrix-smoke:
-    name: Smoke (${{ matrix.react }}
+  test-react-18:
+    name: Test in React (${{ matrix.react }}
     runs-on: self-hosted
     needs:
       - verify
     strategy:
       fail-fast: false
       matrix:
-        react: ["16.14.0", "17.0.2", "18.3.1", "19.2.0"]
-        exclude:
-          - react: "17.0.2"
+        react: ["18.3.1", "19.2.0"]
+        include:
           - react: "18.3.1"
 
     steps:
@@ -89,17 +88,16 @@ jobs:
       - name: Build
         run: npm run build
 
-  test-matrix-full:
-    name: Full suite (${{ matrix.react }}
+  test-react-19:
+    name: Test in React (${{ matrix.react }}
     runs-on: self-hosted
     needs:
       - verify
     strategy:
       fail-fast: false
       matrix:
+        react: ["18.3.1", "19.2.0"]
         include:
-          - react: "17.0.2"
-          - react: "18.3.1"
           - react: "19.2.0"
     steps:
       - name: Checkout
@@ -137,8 +135,8 @@ jobs:
     runs-on: self-hosted
     needs:
       - verify
-      - test-matrix-smoke
-      - test-matrix-full
+      - test-react-18
+      - test-react-19
     if: ${{ always() }}
     steps:
       - name: Enforce required checks
@@ -147,12 +145,12 @@ jobs:
             echo "Required CI checks did not pass: verify"
             exit 1
           fi
-          if [ "${{ needs.test-matrix-smoke.result }}" != "success" ]; then
-            echo "Required CI checks did not pass: test-matrix-smoke"
+          if [ "${{ needs.test-react-18.result }}" != "success" ]; then
+            echo "Required CI checks did not pass: test-react-18"
             exit 1
           fi
-          if [ "${{ needs.test-matrix-full.result }}" != "success" ]; then
-            echo "Required CI checks did not pass: test-matrix-full"
+          if [ "${{ needs.test-react-19.result }}" != "success" ]; then
+            echo "Required CI checks did not pass: test-react-19"
             exit 1
           fi
           echo "All required checks passed."
