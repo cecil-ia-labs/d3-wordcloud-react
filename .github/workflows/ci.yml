@@ -36,7 +36,10 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Run the test suite with coverage
+      - name: Test Suite
+        run: npm test
+
+      - name: Test Coverage
         run: npm run test:coverage
 
       - name: Build
@@ -74,8 +77,11 @@ jobs:
             react@${{ matrix.react }} \
             react-dom@${{ matrix.react }}
 
-      - name: Unit test smoke
-        run: npm run test:unit -- --watchAll=false --runInBand --passWithNoTests
+      - name: Test Suite
+        run: npm test
+
+      - name: Test Coverage
+        run: npm run test:coverage
 
   test-matrix-full:
     name: Full suite (${{ matrix.react }}
@@ -108,8 +114,11 @@ jobs:
             react@${{ matrix.react }} \
             react-dom@${{ matrix.react }}
 
-      - name: Unit tests
-        run: npm run test:unit -- --watchAll=false --runInBand
+      - name: Test Suite
+        run: npm test
+
+      - name: Test Coverage
+        run: npm run test:coverage
 
       - name: Build
         run: npm run build
