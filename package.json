@@ -1,4 +1,5 @@
 {
+  "author": "juninhodeluca",
   "bugs": "https://github.com/cecil-ia-labs/d3-wordcloud-react/issues",
   "dependencies": {
     "d3-array": "^3.2.4",
@@ -18,6 +19,8 @@
   "description": "D3-based word cloud component for React >= 18",
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
     "@types/d3-array": "^3.2.2",
     "@types/d3-cloud": "^1.2.9",
     "@types/d3-scale": "^4.0.9",
@@ -29,8 +32,6 @@
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@types/seedrandom": "^3.0.8",
-    "@testing-library/jest-dom": "^6.8.0",
-    "@testing-library/react": "^16.3.0",
     "@vitest/coverage-v8": "^4.0.15",
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
@@ -38,9 +39,13 @@
     "globals": "^16.4.0",
     "jsdom": "^27.0.0",
     "tsup": "^8.5.1",
+    "typescript": "^5.9.2",
     "typescript-eslint": "^8.37.0",
-    "vitest": "^4.0.15",
-    "typescript": "^5.9.2"
+    "vitest": "^4.0.15"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "files": [
     "dist"
@@ -52,17 +57,10 @@
     "react",
     "react-18"
   ],
-  "author": "juninhodeluca",
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
-  },
   "license": "MIT",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "name": "@cecilialabs/d3-wordcloud-react",
-  "type": "module",
   "peerDependencies": {
     "react": "^18.3.1"
   },
@@ -82,5 +80,7 @@
     "typecheck": "tsc --noEmit"
   },
   "source": "src/index.tsx",
+  "type": "module",
+  "types": "dist/index.d.ts",
   "version": "1.4.6"
 }
