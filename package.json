@@ -64,6 +64,10 @@
   "peerDependencies": {
     "react": "^18.3.1"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cecil-ia-labs/d3-wordcloud-react.git"
