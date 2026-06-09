@@ -55,8 +55,8 @@ jobs:
       matrix:
         react: ["16.14.0", "17.0.2", "18.3.1", "19.2.0"]
         exclude:
-          - react: "16.14.0"
           - react: "17.0.2"
+          - react: "18.3.1"
 
     steps:
       - name: Checkout
@@ -98,7 +98,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - react: "16.14.0"
+          - react: "17.0.2"
           - react: "18.3.1"
           - react: "19.2.0"
     steps:
