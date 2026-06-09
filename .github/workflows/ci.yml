@@ -77,11 +77,17 @@ jobs:
             react@${{ matrix.react }} \
             react-dom@${{ matrix.react }}
 
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Test Suite
         run: npm test
 
       - name: Test Coverage
         run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
 
   test-matrix-full:
     name: Full suite (${{ matrix.react }}
@@ -113,6 +119,9 @@ jobs:
           npm install --no-save \
             react@${{ matrix.react }} \
             react-dom@${{ matrix.react }}
+
+      - name: Typecheck
+        run: npm run typecheck
 
       - name: Test Suite
         run: npm test

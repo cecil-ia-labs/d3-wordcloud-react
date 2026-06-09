@@ -27,19 +27,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify package
+      - name: Verify Package
         run: npm test
 
-      - name: Build package
+      - name: Build Package
         run: npm run build
 
-      - name: Security audit (production dependencies)
+      - name: Security Audit (Production Dependencies)
         run: npm audit --omit=dev
 
-      - name: Validate package tarball (dry run)
+      - name: Validate Package Tarball (Dry Run)
         run: npm publish --access public --dry-run
 
-      - name: Guard publish (skip if version already exists)
+      - name: Guard Publish (Skip if Version Already Exists)
         id: publish_guard
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
@@ -53,7 +53,7 @@ jobs:
             echo "Version ${PACKAGE_NAME}@${PACKAGE_VERSION} is new and eligible for publish."
           fi
 
-      - name: Publish package
+      - name: Publish Package
         if: steps.publish_guard.outputs.publish == 'true'
         run: npm publish --access public --provenance
         env:
