@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.6](https://github.com/cecilia-labs/d3-wordcloud-react/releases/tag/v1.4.6) (2026-06-09)
+
+- Converted the package source to a fully typed TypeScript codebase.
+- Added JSDoc coverage for the public component, helpers, and types.
+- Added Vitest-based tests and coverage reporting.
+- Introduced GitHub Actions workflows for linting, building, testing, and npm publishing.
+- Updated the README, package version, and release notes for the new workflow.
+
 ## [1.3.0](https://github.com/juninhodeluca/wordcloud-react-18) (2025-09-16)
 - Updated dependencies `v1.2.5`.
 - React 18 is now peer dependencie `.node-version`.

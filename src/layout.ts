@@ -1,7 +1,7 @@
 import { descending } from 'd3-array';
 import d3Cloud from 'd3-cloud';
 import 'd3-transition';
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
 import seedrandom from 'seedrandom';
 import tippy from 'tippy.js';
 
@@ -14,8 +14,31 @@ import {
   getTransform,
   rotate,
 } from './utils';
+import type {
+  LayoutArgs,
+  LayoutWord,
+  RandomSource,
+  RenderArgs,
+  Word,
+} from './types';
+import type { Instance as TippyInstance } from 'tippy.js';
 
-export function render({ callbacks, options, random, selection, words }) {
+type CloudLayout = ReturnType<typeof d3Cloud> & {
+  revive?: () => void;
+};
+
+/**
+ * Render the laid out words into the SVG selection.
+ *
+ * @param args - Render payload produced by the layout engine.
+ */
+export function render({
+  callbacks,
+  options,
+  random,
+  selection,
+  words,
+}: RenderArgs): void {
   const {
     getWordColor,
     getWordTooltip,
@@ -33,28 +56,34 @@ export function render({ callbacks, options, random, selection, words }) {
   } = options;
   const { fontFamily, transitionDuration } = options;
 
-  function getFill(word) {
+  /**
+   * Resolve the fill color for a word.
+   *
+   * @param word - The word being rendered.
+   * @returns The fill color to apply.
+   */
+  function getFill(word: LayoutWord): string {
     return getWordColor ? getWordColor(word) : choose(colors, random);
   }
 
-  // Load words
-  let tooltipInstance;
-  const vizWords = selection.selectAll('text').data(words);
+  let tooltipInstance: TippyInstance | null = null;
+  const vizWords = selection.selectAll<SVGTextElement, LayoutWord>('text').data(words);
+
   vizWords.join(
     enter => {
-      let text = enter
+      const text = enter
         .append('text')
-        .on('click', (event, word) => {
+        .on('click', (event: MouseEvent, word: LayoutWord) => {
           if (onWordClick) {
             onWordClick(word, event);
           }
         })
-        .on('mouseover', (event, word) => {
+        .on('mouseover', (event: MouseEvent, word: LayoutWord) => {
           if (
             enableTooltip &&
-            (!tooltipInstance || tooltipInstance.isDestroyed)
+            (!tooltipInstance || tooltipInstance.state.isDestroyed)
           ) {
-            tooltipInstance = tippy(event.target, {
+            tooltipInstance = tippy(event.target as Element, {
               animation: 'scale',
               arrow: true,
               content: () => getWordTooltip(word),
@@ -70,9 +99,10 @@ export function render({ callbacks, options, random, selection, words }) {
             onWordMouseOver(word, event);
           }
         })
-        .on('mouseout', (event, word) => {
+        .on('mouseout', (event: MouseEvent, word: LayoutWord) => {
           if (tooltipInstance && !tooltipInstance.state.isVisible) {
             tooltipInstance.destroy();
+            tooltipInstance = null;
           }
 
           if (onWordMouseOut) {
@@ -87,20 +117,20 @@ export function render({ callbacks, options, random, selection, words }) {
         .attr('text-anchor', 'middle')
         .attr('transform', 'translate(0, 0) rotate(0)');
 
-      if (typeof textAttributes === 'object') {
-        Object.keys(textAttributes).forEach(key => {
-          text = text.attr(key, textAttributes[key]);
-        });
-      }
+      Object.entries(textAttributes).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          text.attr(key, value);
+        }
+      });
 
-      text = text.call(enter =>
-        enter
-          .transition()
-          .duration(transitionDuration)
-          .attr('font-size', getFontSize)
-          .attr('transform', getTransform)
-          .text(getText),
-      );
+      text
+        .transition()
+        .duration(transitionDuration)
+        .attr('font-size', getFontSize)
+        .attr('transform', getTransform)
+        .text(getText);
+
+      return text;
     },
     update => {
       update
@@ -111,6 +141,8 @@ export function render({ callbacks, options, random, selection, words }) {
         .attr('font-size', getFontSize)
         .attr('transform', getTransform)
         .text(getText);
+
+      return update;
     },
     exit => {
       exit
@@ -118,10 +150,17 @@ export function render({ callbacks, options, random, selection, words }) {
         .duration(transitionDuration)
         .attr('fill-opacity', 0)
         .remove();
+
+      return exit;
     },
   );
 }
 
+/**
+ * Calculate the layout positions for the provided words.
+ *
+ * @param args - Layout payload from the component.
+ */
 export function layout({
   callbacks,
   maxWords,
@@ -129,7 +168,7 @@ export function layout({
   selection,
   size,
   words,
-}) {
+}: LayoutArgs): void {
   const MAX_LAYOUT_ATTEMPTS = 10;
   const SHRINK_FACTOR = 0.95;
   const {
@@ -153,25 +192,20 @@ export function layout({
     .slice(0, maxWords);
 
   const random = seedrandom(
-    deterministic ? randomSeed || 'deterministic' : null,
-  );
+    deterministic ? randomSeed ?? 'deterministic' : undefined,
+  ) as RandomSource;
 
-  let cloud;
-  if (enableOptimizations) {
-    cloud = optimizedD3Cloud();
-  } else {
-    cloud = d3Cloud();
-  }
+  const cloud: CloudLayout = enableOptimizations
+    ? (optimizedD3Cloud() as CloudLayout)
+    : (d3Cloud() as CloudLayout);
 
   cloud
     .size(size)
-    // @ts-ignore
     .padding(padding)
-    .words(_.cloneDeep(sortedWords))
-    // .words(clonedeep(sortedWords))
+    .words(cloneDeep(sortedWords))
     .rotate(() => {
       if (rotations === undefined) {
-        // Default rotation algorithm
+        // Default rotation algorithm.
         return (~~(random() * 6) - 3) * 30;
       }
 
@@ -184,35 +218,42 @@ export function layout({
     .fontStyle(fontStyle)
     .fontWeight(fontWeight);
 
-  function draw(fontSizes, attempts = 1) {
+  /**
+   * Run a layout pass and recursively shrink the font size if words collide.
+   *
+   * @param currentFontSizes - The active font-size range for this attempt.
+   * @param attempts - The number of layout attempts completed so far.
+   */
+  function draw(currentFontSizes: [number, number], attempts = 1): void {
     if (enableOptimizations) {
-      cloud.revive();
+      cloud.revive?.();
     }
 
+    const fontScale = getFontScale(sortedWords, currentFontSizes, scale);
+
     cloud
-      .fontSize(word => {
-        const fontScale = getFontScale(sortedWords, fontSizes, scale);
-        return fontScale(word.value);
-      })
-      .on('end', computedWords => {
-        /** KNOWN ISSUE: https://github.com/jasondavies/d3-cloud/issues/36
+      .fontSize(word => fontScale((word as Word).value))
+      .on('end', (computedWords: Word[]) => {
+        const laidOutWords = computedWords as LayoutWord[];
+
+        /**
+         * KNOWN ISSUE: https://github.com/jasondavies/d3-cloud/issues/36
          * Recursively layout and decrease font-sizes by a SHRINK_FACTOR.
          * Bail out with a warning message after MAX_LAYOUT_ATTEMPTS.
          */
         if (
-          sortedWords.length !== computedWords.length &&
+          sortedWords.length !== laidOutWords.length &&
           attempts <= MAX_LAYOUT_ATTEMPTS
         ) {
           if (attempts === MAX_LAYOUT_ATTEMPTS) {
             console.warn(
-              `Unable to layout ${sortedWords.length -
-                computedWords.length} word(s) after ${attempts} attempts.  Consider: (1) Increasing the container/component size. (2) Lowering the max font size. (3) Limiting the rotation angles.`,
+              `Unable to layout ${sortedWords.length - laidOutWords.length} word(s) after ${attempts} attempts. Consider: (1) Increasing the container/component size. (2) Lowering the max font size. (3) Limiting the rotation angles.`,
             );
           }
 
-          const minFontSize = Math.max(fontSizes[0] * SHRINK_FACTOR, 1);
+          const minFontSize = Math.max(currentFontSizes[0] * SHRINK_FACTOR, 1);
           const maxFontSize = Math.max(
-            fontSizes[1] * SHRINK_FACTOR,
+            currentFontSizes[1] * SHRINK_FACTOR,
             minFontSize,
           );
 
@@ -223,7 +264,7 @@ export function layout({
             options,
             random,
             selection,
-            words: computedWords,
+            words: laidOutWords,
           });
         }
       })

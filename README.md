@@ -1,74 +1,71 @@
-# wordcloud-react-18
+# d3-wordcloud-react
 
-Simple React + D3 wordcloud component with powerful features. Uses the [`d3-cloud`](https://github.com/jasondavies/d3-cloud) layout.
-This is a fork from [`☁️ react-wordcloud`](https://github.com/chrisrzhou/react-wordcloud), with updated dependencies and React 18.
+Typed React + D3 word cloud component built on the [`d3-cloud`](https://github.com/jasondavies/d3-cloud) layout.
 
-![image](/public/wordcloud.png)
+This package is a maintained fork of [`react-wordcloud`](https://github.com/chrisrzhou/react-wordcloud) with a modern TypeScript source tree, updated tooling, and current React 18/19-friendly dependencies.
 
 ## Install
 
-```sh
+```bash
 npm install d3-wordcloud-react
 ```
 
-## Use
+## Usage
 
-### Simple
+### Minimal example
 
-```js
-import React from 'react';
+```tsx
 import { ReactWordCloud } from 'd3-wordcloud-react';
 
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/animations/scale.css';
 
 const words = [
-  {
-    text: 'told',
-    value: 64,
-  },
-  {
-    text: 'mistake',
-    value: 11,
-  },
-  {
-    text: 'thought',
-    value: 16,
-  },
-  {
-    text: 'bad',
-    value: 17,
-  },
-]
+  { text: 'told', value: 64 },
+  { text: 'mistake', value: 11 },
+  { text: 'thought', value: 16 },
+  { text: 'bad', value: 17 },
+];
 
-function SimpleWordcloud() {
-  return <ReactWordCloud words={words} />
+export function SimpleWordCloud() {
+  return <ReactWordCloud words={words} />;
 }
 ```
 
-By default, `ReactWordCloud` is configured with animated tooltips enabled and requires CSS for styling. Tippy provides base styling in the resources above or you can create your own.
+`ReactWordCloud` renders responsively by default and enables tooltips out of the box. If you want tooltips to match the default styling shown in the examples, keep the Tippy CSS imports above.
 
-### Kitchen Sink
+### Fully customized example
 
-An example showing various features (callbacks, options, size).
+```tsx
+import { ReactWordCloud, type ReactWordCloudProps } from 'd3-wordcloud-react';
 
-```js
-const callbacks = {
-  getWordColor: word => word.value > 50 ? "blue" : "red",
-  onWordClick: console.log,
-  onWordMouseOver: console.log,
-  getWordTooltip: word => `${word.text} (${word.value}) [${word.value > 50 ? "good" : "bad"}]`,
-}
-const options = {
+const callbacks: ReactWordCloudProps['callbacks'] = {
+  getWordColor: word => (word.value > 50 ? '#0d6efd' : '#dc3545'),
+  getWordTooltip: word => `${word.text} (${word.value})`,
+  onWordClick: (word, event) => {
+    console.log('clicked', word.text, event.type);
+  },
+};
+
+const options: ReactWordCloudProps['options'] = {
+  fontFamily: 'Inter, system-ui, sans-serif',
   rotations: 2,
   rotationAngles: [-90, 0],
+  transitionDuration: 450,
 };
-const size = [600, 400];
-const words = [...];
 
-function MyWordcloud() {
+const size: [number, number] = [600, 400];
+
+const words: ReactWordCloudProps['words'] = [
+  { text: 'analysis', value: 42 },
+  { text: 'design', value: 26 },
+  { text: 'tests', value: 18 },
+  { text: 'typescript', value: 12 },
+];
+
+export function RichWordCloud() {
   return (
-    <ReactWordcCloud
+    <ReactWordCloud
       callbacks={callbacks}
       options={options}
       size={size}
@@ -78,27 +75,46 @@ function MyWordcloud() {
 }
 ```
 
-## Development
+### Exported types
 
-### Getting Started
+The package also exports the component props and shared utility types, so you can type your own helpers against the same public contract:
 
-```bash
-# Install dependencies
-npm install
-
-# Build the package
-npm run build
-
-# Run tests
-npm test
+```ts
+import type {
+  Callbacks,
+  LayoutWord,
+  Options,
+  ReactWordCloudProps,
+  Word,
+} from 'd3-wordcloud-react';
 ```
 
-### Release Process
+## API notes
 
-This project uses automated releases. To publish a new version:
+- `ReactWordCloud` is the canonical export.
+- `ReactWordcloud` is kept as a backwards-compatible alias.
+- `words` must contain at least `text` and `value`.
+- `options.svgAttributes` and `options.textAttributes` allow you to pass additional SVG attributes.
+- `options.tooltipOptions` is forwarded to Tippy.js.
 
-1. Update version in `package.json`: `npm version [patch|minor|major]`
-2. Push to main: `git push origin main`
-3. GitHub Actions will automatically create a release and publish to NPM
+## Development
 
-See [RELEASE.md](./RELEASE.md) for detailed information about the release process.
+```bash
+npm install
+npm run lint
+npm run lint:fix
+npm run typecheck
+npm test
+npm run test:coverage
+npm run build
+```
+
+## Release process
+
+Releases are automated through GitHub Actions:
+
+1. Update the package version.
+2. Push the tagged commit to `main`.
+3. The publish workflow builds the package and uploads the release artifacts to npm.
+
+See [RELEASE.md](./RELEASE.md) for the manual release notes and maintenance checklist.

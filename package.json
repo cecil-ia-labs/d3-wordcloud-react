@@ -17,21 +17,33 @@
   },
   "description": "D3-based word cloud component for React >= 18",
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@types/d3-array": "^3.2.2",
     "@types/d3-cloud": "^1.2.9",
     "@types/d3-scale": "^4.0.9",
     "@types/d3-scale-chromatic": "^3.1.0",
     "@types/d3-selection": "^3.0.11",
+    "@types/d3-transition": "^3.0.6",
     "@types/lodash": "^4.17.20",
+    "@types/node": "^24.3.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@types/seedrandom": "^3.0.8",
-    "microbundle": "^0.15.1",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@vitest/coverage-v8": "^4.0.15",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.4.0",
+    "jsdom": "^27.0.0",
+    "tsup": "^8.5.1",
+    "typescript-eslint": "^8.37.0",
+    "vitest": "^4.0.15",
     "typescript": "^5.9.2"
   },
   "files": [
-    "dist",
-    "types/index.d.ts"
+    "dist"
   ],
   "homepage": "https://github.com/cecil-ia-labs/d3-wordcloud-react",
   "keywords": [
@@ -42,7 +54,7 @@
   ],
   "author": "juninhodeluca",
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
   "license": "MIT",
@@ -59,12 +71,16 @@
     "url": "git+https://github.com/cecil-ia-labs/d3-wordcloud-react.git"
   },
   "scripts": {
-    "build": "microbundle --globals tippy.js=tippy --jsx React.createElement",
+    "build": "tsup src/index.tsx --format esm,cjs --dts --clean --out-dir dist",
     "clean": "rm -rf dist",
-    "prepare": "npm run clean; npm run build",
-    "refresh": "rm -Rf node_modules/ dist/ package-lock.json && npm install",
-    "test": "echo \"No tests specified - building and checking TypeScript types\""
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "prepare": "npm run clean && npm run build",
+    "refresh": "rm -rf node_modules dist package-lock.json && npm install",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
-  "source": "index.js",
-  "version": "1.4.5"
+  "source": "src/index.tsx",
+  "version": "1.4.6"
 }

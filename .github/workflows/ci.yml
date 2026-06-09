@@ -1,36 +1,54 @@
-# CI workflow for pull requests and pushes to non-main branches
-name: CI
+name: Pre-commit
 
 on:
   pull_request:
   push:
-    branches-ignore: [ main ]
+    branches-ignore:
+      - main
 
 jobs:
-  test:
+  pre-commit:
+    name: Lint, build, and test
     runs-on: self-hosted
     strategy:
       matrix:
-        node-version: [ 18, 20 ]
+        node-version:
+          - 18
+          - 20
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - name: Clean
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: ${{ matrix.node-version }}
+
+      - name: Clean workspace
         run: npm run clean
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm test
+      - name: Lint source
+        run: npm run lint
 
-      - name: Build package
+      - name: Apply lint fixes
+        run: npm run lint:fix
+
+      - name: Ensure lint fixes are not needed
+        run: git diff --exit-code
+
+      - name: Type-check the project
+        run: npm run typecheck
+
+      - name: Build the package
         run: npm run build
 
-      - name: Verify package can be packed
+      - name: Run the test suite with coverage
+        run: npm run test:coverage
+
+      - name: Verify the package can be packed
         run: npm pack --dry-run
