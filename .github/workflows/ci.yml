@@ -46,7 +46,7 @@ jobs:
         run: npm run build
 
   test-react-18:
-    name: Test in React (${{ matrix.react }}
+    name: Test in React (${{ matrix.react }})
     runs-on: self-hosted
     needs:
       - verify
@@ -89,7 +89,7 @@ jobs:
         run: npm run build
 
   test-react-19:
-    name: Test in React (${{ matrix.react }}
+    name: Test in React (${{ matrix.react }})
     runs-on: self-hosted
     needs:
       - verify
